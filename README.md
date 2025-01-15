@@ -50,3 +50,26 @@ Ensure you have the following software installed:
    git clone https://github.com/your-username/project-name.git
    cd project-name
    ```
+
+2. Install the dependencies:
+
+npm install
+
+3. Set up the environment variables (e.g., in .env file):
+
+touch .env
+
+Add the following configuration:
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=yourpassword
+DB_NAME=your_database_name
+JWT_SECRET=your_jwt_secret
+
+4.  Create and configure your MySQL database.
+    Usage
+    Running the Application
+    To start the development server:
+
+    bun run dev

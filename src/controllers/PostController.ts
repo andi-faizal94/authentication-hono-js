@@ -2,7 +2,7 @@ import { Context } from "hono";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import prisma from "../../prisma/client";
-import { secretKey } from "../helper.ts";
+import { secretKey } from "../helper";
 const SECRET_KEY = process.env.SECRET_KEY || secretKey;
 
 const authorization = (id: number, userId: any) => {

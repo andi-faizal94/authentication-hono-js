@@ -7,9 +7,9 @@ import {
   login,
   registerUser,
   updatePost,
-  verifyToken,
   createPost,
 } from "../controllers/PostController";
+import { verifyToken } from "../middleware/authentification";
 
 const router = new Hono();
 

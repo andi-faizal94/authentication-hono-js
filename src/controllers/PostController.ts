@@ -7,30 +7,11 @@ const SECRET_KEY =
   process.env.SECRET_KEY ||
   "edc35b4f3a755ebe9d4c07f156b27f952a4b7d4309e234c403f26688eb041a2a72bd344cb9e4173d893df77746c9b3bdcafe877d814197c77366d7ed6887ffd7";
 
-export const verifyToken = async (c: Context, next: () => Promise<void>) => {
-  const authHeader = c.req.header("authorization");
-  const token = authHeader ? authHeader.split(" ")[1] : undefined;
-  if (!token) {
-    return c.json(
-      {
-        message: "Access Denied: No token provided",
-      },
-      401
-    );
+const authorization = (id: number, userId: any) => {
+  if (id !== userId) {
+    return true;
   }
-
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    c.set("user", decoded);
-    await next();
-  } catch (err) {
-    return c.json(
-      {
-        message: "Invalid token",
-      },
-      403
-    );
-  }
+  return false;
 };
 
 const generateToken = (user: any) => {
@@ -107,15 +88,7 @@ export const getPosts = async (c: Context) => {
 
 export const createPost = async (c: Context) => {
   try {
-    // using form data
-    // const body = await c.req.parseBody();
-
-    // const title = typeof body["title"] === "string" ? body["title"] : "";
-    // const content = typeof body["content"] === "string" ? body["content"] : "";
-
-    // using json
     const { title, content } = await c.req.json();
-
     const existingPost = await prisma.post.findMany({
       where: { title: title },
     });
@@ -126,14 +99,17 @@ export const createPost = async (c: Context) => {
           success: false,
           message: "Post with this title already exists.",
         },
-        400 // 400 Bad Request
+        400
       );
     }
+
+    const users = c.get("user");
 
     const post = await prisma.post.create({
       data: {
         title: title,
         content: content,
+        userId: users?.id,
       },
     });
 
@@ -183,14 +159,32 @@ export const getPostById = async (c: Context) => {
 export const updatePost = async (c: Context) => {
   try {
     const postId = parseInt(c.req.param("id"));
-    // ini menggunakan form data
-    // const body = await c.req.parseBody();
-
-    // const title = typeof body["title"] === "string" ? body["title"] : "";
-    // const content = typeof body["content"] === "string" ? body["content"] : "";
-
-    // ini menggunakan json
     const { title, content } = await c.req.json();
+
+    const postById = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    const users = c.get("user");
+
+    if (authorization(users?.id, postById?.id)) {
+      return c.json(
+        {
+          success: false,
+          message: "Unauthorized: You can only edit your own posts.",
+        },
+        403
+      );
+    }
+    // if (postById?.id !== users?.id) {
+    //   return c.json(
+    //     {
+    //       success: false,
+    //       message: "Unauthorized: You can only edit your own posts.",
+    //     },
+    //     403
+    //   );
+    // }
 
     const post = await prisma.post.update({
       where: { id: postId },
@@ -217,14 +211,23 @@ export const updatePost = async (c: Context) => {
 export const editPost = async (c: Context) => {
   try {
     const postId = parseInt(c.req.param("id"));
-    // ini menggunakan form data
-    // const body = await c.req.parseBody();
-
-    // const title = typeof body["title"] === "string" ? body["title"] : "";
-    // const content = typeof body["content"] === "string" ? body["content"] : "";
-
-    // ini menggunakan json
     const { title, content } = await c.req.json();
+
+    const users = c.get("user");
+
+    const postById = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (authorization(users?.id, postById?.id)) {
+      return c.json(
+        {
+          success: false,
+          message: "Unauthorized: You can only edit your own posts.",
+        },
+        403
+      );
+    }
 
     const post = await prisma.post.update({
       where: { id: postId },
@@ -232,6 +235,7 @@ export const editPost = async (c: Context) => {
         title: title,
         content: content,
         updatedAt: new Date(),
+        userId: users?.id,
       },
     });
 
@@ -251,6 +255,22 @@ export const editPost = async (c: Context) => {
 export const deletePost = async (c: Context) => {
   try {
     const postId = parseInt(c.req.param("id"));
+
+    const postById = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    const users = c.get("user");
+
+    if (authorization(users?.id, postById?.id)) {
+      return c.json(
+        {
+          success: false,
+          message: "Unauthorized: You can only edit your own posts.",
+        },
+        403
+      );
+    }
 
     await prisma.post.delete({
       where: { id: postId },

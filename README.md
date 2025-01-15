@@ -1,4 +1,4 @@
-# Project Name
+# Hono and authentification
 
 Brief description of your project and its functionality.
 

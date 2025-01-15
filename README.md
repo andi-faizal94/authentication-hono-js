@@ -59,7 +59,7 @@ Ensure you have the following software installed:
 
 3. Set up the environment variables (e.g., in .env file):
 
-```bash
+   ```bash
     touch .env
     Add the following configuration:
     DB_HOST=localhost
@@ -67,12 +67,12 @@ Ensure you have the following software installed:
     DB_PASSWORD=yourpassword
     DB_NAME=your_database_name
     JWT_SECRET=your_jwt_secret
-```
+   ```
 
-4.  Create and configure your MySQL database.
-    Usage
-    Running the Application
-    To start the development server:
-    ```bash
-    bun run dev
-    ```
+4. Create and configure your MySQL database.
+   Usage
+   Running the Application
+   To start the development server:
+   ```bash
+   bun run dev
+   ```

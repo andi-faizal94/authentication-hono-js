@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import prisma from "../../prisma/client";
+import prisma from "../prisma/client";
 import {
   responseSuccess,
   responseError,

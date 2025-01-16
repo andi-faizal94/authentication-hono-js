@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import prisma from "../../prisma/client";
+import prisma from "../prisma/client";
 import validator from "validator";
 import * as nodemailer from "nodemailer";
 import * as crypto from "crypto";

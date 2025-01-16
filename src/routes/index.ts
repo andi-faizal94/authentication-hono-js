@@ -4,13 +4,11 @@ import {
   editPost,
   getPostById,
   getPosts,
-  login,
-  registerUser,
   updatePost,
   createPost,
 } from "../controllers/PostController";
 import { verifyToken } from "../middleware/authentification";
-
+import { login, registerUser } from "../controllers/AuthController";
 const router = new Hono();
 
 router.post("/register", (c) => registerUser(c));

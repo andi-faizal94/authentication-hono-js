@@ -1,6 +1,10 @@
 import { Context } from "hono";
 import prisma from "../../prisma/client";
-import { responseSuccess, responseError } from "../utils/helper";
+import {
+  responseSuccess,
+  responseError,
+  responseMessage,
+} from "../utils/helper";
 
 const authorization = (id: number, userId: any) => {
   if (id !== userId) {
@@ -153,13 +157,7 @@ export const deletePost = async (c: Context) => {
       where: { id: postId },
     });
 
-    return c.json(
-      {
-        success: true,
-        message: "Post Deleted Successfully!",
-      },
-      200
-    );
+    return c.json(responseMessage("Post Deleted Successfully!"), 200);
   } catch (e: unknown) {
     console.error(`Error deleting post: ${e}`);
   }

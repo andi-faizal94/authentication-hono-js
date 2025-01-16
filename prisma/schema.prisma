@@ -22,7 +22,18 @@ model User {
   username String @unique
   password String
   email    String @unique
+  passwordResetTokens  PasswordResetToken[]
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique  // Make sure token is unique
+  expiresAt DateTime
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+ @@map("passwordresettoken")
 }
 
 

@@ -9,10 +9,12 @@
     "bcrypt": "^5.1.1",
     "hono": "^4.6.16",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "5.13.0"
+    "prisma": "5.13.0",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/jsonwebtoken": "^9.0.7"
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/validator": "^13.12.2"
   }
 }

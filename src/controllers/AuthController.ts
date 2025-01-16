@@ -2,7 +2,8 @@ import { Context } from "hono";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import prisma from "../../prisma/client";
-import { secretKey } from "../helper";
+import { secretKey } from "../helpers";
+import validator from "validator";
 const SECRET_KEY = process.env.SECRET_KEY || secretKey;
 
 const generateToken = (user: any) => {
@@ -11,14 +12,14 @@ const generateToken = (user: any) => {
   });
 };
 export const registerUser = async (c: Context) => {
-  const { username, password } = await c.req.json();
-
+  const { username, password, email } = await c.req.json();
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
     const user = await prisma.user.create({
       data: {
         username,
+        email,
         password: hashedPassword,
       },
     });
@@ -40,39 +41,54 @@ export const registerUser = async (c: Context) => {
 };
 
 export const login = async (c: Context) => {
-  const { username, password } = await c.req.json();
+  const { usernameOrEmail, password } = await c.req.json();
 
-  const user = await prisma.user.findUnique({
-    where: { username },
-  });
+  let user;
 
-  if (!user) {
-    return c.json(
-      {
-        message: "Invalid username or password",
-      },
-      401
-    );
+  const isEmail = validator.isEmail(usernameOrEmail);
+
+  try {
+    if (isEmail) {
+      user = await prisma.user.findUnique({
+        where: { email: usernameOrEmail },
+      });
+    } else {
+      user = await prisma.user.findUnique({
+        where: { username: usernameOrEmail },
+      });
+    }
+
+    if (!user) {
+      return c.json(
+        {
+          message: "Invalid username or password",
+        },
+        401
+      );
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      return c.json(
+        {
+          message: "Invalid username or password",
+        },
+        401
+      );
+    }
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return c.json(
+        {
+          message: "Invalid credentials",
+        },
+        401
+      );
+    }
+
+    const token = generateToken(user);
+    return c.json({ message: "Login successful", token });
+  } catch (error) {
+    console.error(error);
+    c.json({ error: "Database error" });
   }
-
-  if (!(await bcrypt.compare(password, user.password))) {
-    return c.json(
-      {
-        message: "Invalid username or password",
-      },
-      401
-    );
-  }
-
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return c.json(
-      {
-        message: "Invalid credentials",
-      },
-      401
-    );
-  }
-
-  const token = generateToken(user);
-  return c.json({ token });
 };

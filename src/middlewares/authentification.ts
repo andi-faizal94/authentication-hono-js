@@ -1,8 +1,7 @@
 import { Context } from "hono";
 import * as jwt from "jsonwebtoken";
-const SECRET_KEY =
-  process.env.SECRET_KEY ||
-  "edc35b4f3a755ebe9d4c07f156b27f952a4b7d4309e234c403f26688eb041a2a72bd344cb9e4173d893df77746c9b3bdcafe877d814197c77366d7ed6887ffd7";
+
+const SECRET_KEY = process.env.SECRET_KEY!;
 
 export const verifyToken = async (c: Context, next: () => Promise<void>) => {
   const authHeader = c.req.header("authorization");

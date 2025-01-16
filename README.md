@@ -1,6 +1,6 @@
 # Hono and authentification
 
-Brief description of your project and its functionality.
+Implement Authorization and Authentication with Hono JS
 
 ---
 

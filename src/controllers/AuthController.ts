@@ -46,6 +46,24 @@ export const login = async (c: Context) => {
     where: { username },
   });
 
+  if (!user) {
+    return c.json(
+      {
+        message: "Invalid username or password",
+      },
+      401
+    );
+  }
+
+  if (!(await bcrypt.compare(password, user.password))) {
+    return c.json(
+      {
+        message: "Invalid username or password",
+      },
+      401
+    );
+  }
+
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return c.json(
       {

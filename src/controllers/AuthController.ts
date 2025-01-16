@@ -2,13 +2,12 @@ import { Context } from "hono";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import prisma from "../../prisma/client";
-import { secretKey } from "../helpers";
 import validator from "validator";
 import * as nodemailer from "nodemailer";
 import * as crypto from "crypto";
 
 import { errorMessage, messageSuccess, responseMessage } from "../utils/helper";
-const SECRET_KEY = process.env.SECRET_KEY || secretKey;
+const SECRET_KEY = process.env.SECRET_KEY!;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",

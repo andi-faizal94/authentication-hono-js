@@ -1,12 +1,13 @@
-import { Context } from "hono";
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
-import prisma from "../prisma/client";
-import validator from "validator";
-import * as nodemailer from "nodemailer";
 import * as crypto from "crypto";
-
-import { errorMessage, messageSuccess, responseMessage } from "../utils/helper";
+import * as fs from "fs/promises";
+import { Context } from "hono";
+import * as jwt from "jsonwebtoken";
+import * as nodemailer from "nodemailer";
+import * as path from "path";
+import validator from "validator";
+import prisma from "../prisma/client";
+import { errorMessage, jsonCreated, messageSuccess } from "../utils/helper";
 const SECRET_KEY = process.env.SECRET_KEY!;
 
 const transporter = nodemailer.createTransport({
@@ -34,7 +35,10 @@ export const registerUser = async (c: Context) => {
         password: hashedPassword,
       },
     });
-    return c.json(responseMessage("User registered successfully"), 201);
+
+    return c.json({ message: "User registered successfully" }, 201);
+
+    // return jsonCreated(c, "User registered successfully");
   } catch (error) {
     return c.json(errorMessage("User already exists"), 400);
   }
@@ -84,8 +88,6 @@ export const forgotPassword = async (c: Context) => {
   try {
     const user = await prisma.user.findUnique({ where: { email } });
 
-    console.log({ user });
-
     if (!user) {
       return c.json({ message: "User not found" }, 404);
     }
@@ -97,15 +99,15 @@ export const forgotPassword = async (c: Context) => {
       (token) => token.expiresAt > new Date()
     );
 
-    if (expiredTokens.length > 0) {
-      return c.json(
-        {
-          message:
-            "A reset link has already been sent, please check your email.",
-        },
-        400
-      );
-    }
+    // if (expiredTokens.length > 0) {
+    //   return c.json(
+    //     {
+    //       message:
+    //         "A reset link has already been sent, please check your email.",
+    //     },
+    //     400
+    //   );
+    // }
 
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date();
@@ -118,16 +120,28 @@ export const forgotPassword = async (c: Context) => {
         userId: user.id,
       },
     });
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    const resetByToken = `token=${token}`;
+    const emailUser = `${email}`;
+    const userName = `${user?.username}`;
+
+    const htmlContent = await fs.readFile(
+      path.join(__dirname, "..", "utils", "template.html"),
+      "utf8"
+    );
+    const personalizedHtml = htmlContent
+      .replace("{{resetByToken}}", resetByToken)
+      .replace("{{email}}", emailUser)
+      .replace("{{username}}", userName);
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset Request",
-      text: `You requested a password reset. Click the following link to reset your password: ${resetUrl}`,
+      html: personalizedHtml,
     };
 
     await transporter.sendMail(mailOptions);
-
     return c.json({ message: "Reset email sent" });
   } catch (error) {
     console.log("error", error);

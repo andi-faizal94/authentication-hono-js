@@ -1,20 +1,19 @@
 import { Hono } from "hono";
 import {
+  forgotPassword,
+  login,
+  passwordReset,
+  registerUser,
+} from "../controllers/AuthController";
+import {
+  createPost,
   deletePost,
   editPost,
   getPostById,
   getPosts,
   updatePost,
-  createPost,
 } from "../controllers/PostController";
 import { verifyToken } from "../middlewares/authentification";
-import {
-  forgotPassword,
-  login,
-  passwordReset,
-  registerUser,
-  resetPassword,
-} from "../controllers/AuthController";
 const router = new Hono();
 
 router.post("/register", (c) => registerUser(c));

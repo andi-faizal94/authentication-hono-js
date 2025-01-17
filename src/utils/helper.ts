@@ -1,3 +1,5 @@
+import { Context } from "hono";
+
 export const responseSuccess = (data: any, message: string = "OK") => {
   return {
     success: true,
@@ -33,4 +35,21 @@ export const messageSuccess = (token: any, message: string = "OK") => {
     token,
     message,
   };
+};
+
+export const jsonOk = (c: Context, message: string = "OK") => {
+  return c.json(
+    {
+      message,
+    },
+    200
+  );
+};
+export const jsonCreated = (c: Context, message: string = "OK") => {
+  return c.json(
+    {
+      message,
+    },
+    201
+  );
 };

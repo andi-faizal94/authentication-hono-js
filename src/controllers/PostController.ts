@@ -80,7 +80,7 @@ export const updatePost = async (c: Context) => {
 
     const users = c.get("user");
 
-    if (authorization(users?.id, postById?.id)) {
+    if (authorization(users?.id, postById?.userId)) {
       return c.json(
         responseError("Unauthorized: You can only edit your own posts."),
         403
@@ -113,7 +113,7 @@ export const editPost = async (c: Context) => {
       where: { id: postId },
     });
 
-    if (authorization(users?.id, postById?.id)) {
+    if (authorization(users?.id, postById?.userId)) {
       return c.json(
         responseError("Unauthorized: You can only edit your own posts."),
         403

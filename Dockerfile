@@ -1,4 +1,3 @@
-Copy
 # Use a base image that supports Node.js
 FROM node:18-alpine
 

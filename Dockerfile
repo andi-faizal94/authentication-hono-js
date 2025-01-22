@@ -1,13 +1,17 @@
+# Use a base image that supports Node.js
 FROM node:18-alpine
 
 # Install Bun
-RUN bun install
+RUN curl -fsSL https://bun.sh/install | bash
 
-# List installed modules to debug
-RUN ls -la /app/node_modules
+# Add Bun to the PATH
+ENV PATH="/root/.bun/bin:${PATH}"
 
-# Copy the application source code
-COPY src ./src
+# Set the working directory
+WORKDIR /app
+
+# Copy the package.json and bun.lockb files
+COPY package.json bun.lockb ./
 
 # Install dependencies
 RUN bun install

@@ -3,6 +3,7 @@ import {
   forgotPassword,
   login,
   passwordReset,
+  refreshToken,
   registerUser,
 } from "../controllers/AuthController";
 import {
@@ -18,6 +19,7 @@ const router = new Hono();
 
 router.post("/register", (c) => registerUser(c));
 router.post("/login", (c) => login(c));
+router.post("/refresh-token", (c) => refreshToken(c));
 router.post("/forgot-password", (c) => forgotPassword(c));
 router.post("/reset-password", (c) => passwordReset(c));
 router.get("/posts", verifyToken, (c) => getPosts(c));

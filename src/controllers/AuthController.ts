@@ -3,11 +3,14 @@ import * as crypto from "crypto";
 import * as fs from "fs/promises";
 import { Context } from "hono";
 import * as jwt from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as path from "path";
 import validator from "validator";
 import prisma from "../prisma/client";
 import { errorMessage, jsonCreated, messageSuccess } from "../utils/helper";
+import { getSignedCookie, setSignedCookie } from "hono/cookie";
+
 const SECRET_KEY = process.env.SECRET_KEY!;
 
 const transporter = nodemailer.createTransport({
@@ -23,6 +26,25 @@ const generateToken = (user: any) => {
     expiresIn: "1h",
   });
 };
+
+const generateRefreshToken = (user: any) => {
+  return jwt.sign(
+    { id: user.id, username: user.username, email: user?.email },
+    SECRET_KEY,
+    {
+      expiresIn: "1d",
+    }
+  );
+};
+
+export const verifyToken = (token: any, secret: any) => {
+  try {
+    return jwt.verify(token, secret);
+  } catch (error) {
+    return null; // Return null if verification fails
+  }
+};
+
 export const registerUser = async (c: Context) => {
   const { username, password, email } = await c.req.json();
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -76,6 +98,19 @@ export const login = async (c: Context) => {
     }
 
     const token = generateToken(user);
+
+    const refreshToken = generateRefreshToken(user);
+
+    await setSignedCookie(c, "refresh_token", refreshToken, SECRET_KEY, {
+      path: "/",
+      secure: true,
+      // domain: process.env.DOMAIN,
+      // httpOnly: true,
+      maxAge: 1000,
+      expires: new Date(Date.UTC(2000, 11, 24, 10, 30, 59, 900)),
+      sameSite: "Strict",
+    });
+
     return c.json(messageSuccess(token, "Login successful"));
   } catch (error) {
     console.error(error);
@@ -197,5 +232,48 @@ export const passwordReset = async (c: Context) => {
     return c.json(response);
   } catch (error) {
     return c.json({ error: error }, 400);
+  }
+};
+
+export const refreshToken = async (c: Context) => {
+  try {
+    const refresh_token = await getSignedCookie(c, SECRET_KEY);
+    const refreshTokenUser = refresh_token?.refresh_token;
+
+    const decodedToken = verifyToken(
+      refreshTokenUser,
+      SECRET_KEY
+    ) as JwtPayload;
+
+    if (!decodedToken) {
+      return c.json({ error: "Invalid refresh token" }, 401);
+    }
+    const user = await prisma.user.findUnique({
+      where: { email: decodedToken?.email },
+    });
+
+    if (!user) {
+      return c.json({ error: "User not found" }, 401);
+    }
+
+    const newToken = generateToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    const expiresDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await setSignedCookie(c, "refresh_token", newRefreshToken, SECRET_KEY, {
+      path: "/",
+      secure: true,
+      domain: process.env.DOMAIN,
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60,
+      expires: expiresDate,
+      sameSite: "Strict",
+    });
+
+    return c.json({ token: newToken });
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: "Refresh token error" }, 500);
   }
 };

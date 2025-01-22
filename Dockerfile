@@ -1,4 +1,3 @@
-Copy
 # Use a base image that supports Node.js
 FROM node:18-buster
 
@@ -11,7 +10,7 @@ ENV PATH="/root/.bun/bin:${PATH}"
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and bun.lockb files
+# Copy package.json and bun.lockb files to the working directory
 COPY package.json bun.lockb ./
 
 # Copy the Prisma schema

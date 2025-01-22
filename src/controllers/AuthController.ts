@@ -40,6 +40,7 @@ export const registerUser = async (c: Context) => {
 
     // return jsonCreated(c, "User registered successfully");
   } catch (error) {
+    return c.json({ message: error });
     return c.json(errorMessage("User already exists"), 400);
   }
 };

@@ -29,7 +29,14 @@ export const createPost = async (c: Context) => {
       where: { title: title },
     });
 
+    const existingContent = await prisma.post.findMany({
+      where: { content },
+    });
+
     if (existingPost.length > 0) {
+      return c.json(responseError("Post with this title already exists."), 400);
+    }
+    if (existingContent.length > 0) {
       return c.json(responseError("Post with this title already exists."), 400);
     }
 

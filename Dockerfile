@@ -1,16 +1,13 @@
 FROM node:18-alpine
 
 # Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
+RUN bun install
 
-# Add Bun to the PATH
-ENV PATH="/root/.bun/bin:${PATH}"
+# List installed modules to debug
+RUN ls -la /app/node_modules
 
-# Set the working directory
-WORKDIR /app
-
-# Copy the package.json and bun.lockb files
-COPY package.json bun.lockb ./
+# Copy the application source code
+COPY src ./src
 
 # Install dependencies
 RUN bun install

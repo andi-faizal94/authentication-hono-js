@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun build src/index.ts -o build/index.js",
-    "start": "bun src/index.ts"
+    "start": "bun run build/index.js"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.5.0",

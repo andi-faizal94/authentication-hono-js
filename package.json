@@ -2,7 +2,7 @@
   "name": "hono-auth",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build --target=bun src/index.ts",
+    "build": "bun build src/index.ts --compile --outfile server",
     "start": "bun run src/index.ts"
   },
   "dependencies": {

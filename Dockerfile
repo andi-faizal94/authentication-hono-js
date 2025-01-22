@@ -1,3 +1,5 @@
+Copy
+# Use a base image that supports Node.js
 FROM node:18-buster
 
 # Install Bun
@@ -9,9 +11,11 @@ ENV PATH="/root/.bun/bin:${PATH}"
 # Set the working directory
 WORKDIR /app
 
-# Copy the relevant files first
+# Copy package.json and bun.lockb files
 COPY package.json bun.lockb ./
-COPY prisma ./prisma/  # Ensure the prisma folder is copied
+
+# Copy the Prisma schema
+COPY prisma ./prisma/
 
 # Install dependencies
 RUN bun install

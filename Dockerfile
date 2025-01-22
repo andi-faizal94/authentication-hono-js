@@ -1,8 +1,4 @@
-# Use a base image that supports Node.js
-FROM node:18-alpine
-
-# Install necessary packages: curl and bash
-RUN apk add --no-cache curl bash
+FROM node:18-buster
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash

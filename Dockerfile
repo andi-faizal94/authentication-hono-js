@@ -13,11 +13,15 @@ ENV PATH="/root/.bun/bin:${PATH}"
 # Set the working directory
 WORKDIR /app
 
-# Copy the package.json and bun.lockb files
+# Copy the relevant files first
 COPY package.json bun.lockb ./
+COPY prisma ./prisma/  # Ensure the prisma folder is copied
 
 # Install dependencies
 RUN bun install
+
+# Generate the Prisma Client
+RUN bun run prisma generate
 
 # Copy the application source code
 COPY src ./src

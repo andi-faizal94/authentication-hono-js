@@ -2,19 +2,22 @@
   "name": "hono-auth",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts -o build/index.js",
-    "start": "bun run build/index.js"
+    "build": "bun build --target=bun src/index.ts",
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.5.0",
     "@hono/zod-openapi": "^0.18.3",
     "@prisma/client": "5.13.0",
     "@types/bcrypt": "^5.0.2",
+    "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "crypto": "^1.0.1",
     "hono": "^4.6.16",
     "jsonwebtoken": "^9.0.2",
+    "mock-aws-s3": "^4.0.2",
     "mustache": "^4.2.0",
+    "nock": "^13.5.6",
     "nodemailer": "^6.9.16",
     "prisma": "5.13.0",
     "validator": "^13.12.0",

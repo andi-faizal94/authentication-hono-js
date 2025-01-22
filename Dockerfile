@@ -1,25 +1,28 @@
-# Build stage
-FROM oven/bun:1 AS builder
+FROM node:18-alpine
 
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+
+# Add Bun to the PATH
+ENV PATH="/root/.bun/bin:${PATH}"
+
+# Set the working directory
 WORKDIR /app
 
-# Copy package files first for better caching
+# Copy the package.json and bun.lockb files
 COPY package.json bun.lockb ./
-RUN bun install --frozen-lockfile
 
-# Copy rest of the files
-COPY . ./
+# Install dependencies
+RUN bun install
 
-# Build the binary
+# Copy the application source code
+COPY src ./src
+
+# Build the application
 RUN bun build src/index.ts --compile --outfile server
 
-# Final stage
-FROM debian:bookworm-slim
+# Expose the application port (set the appropriate port)
+EXPOSE 3000
 
-WORKDIR /app
-
-# Copy only the compiled binary
-COPY --from=builder /app/server ./server
-
-# Run the binary
-CMD ["./server"]
+# Start the application
+CMD ["bun", "run", "src/index.ts"]

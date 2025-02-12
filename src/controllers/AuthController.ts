@@ -2,14 +2,14 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import * as fs from "fs/promises";
 import { Context } from "hono";
+import { getSignedCookie, setSignedCookie } from "hono/cookie";
 import * as jwt from "jsonwebtoken";
 import { JwtPayload } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as path from "path";
 import validator from "validator";
 import prisma from "../prisma/client";
-import { errorMessage, jsonCreated, messageSuccess } from "../utils/helper";
-import { getSignedCookie, setSignedCookie } from "hono/cookie";
+import { errorMessage, messageSuccess } from "../utils/helper";
 
 const SECRET_KEY = process.env.SECRET_KEY!;
 
@@ -63,7 +63,6 @@ export const registerUser = async (c: Context) => {
     // return jsonCreated(c, "User registered successfully");
   } catch (error) {
     return c.json({ message: error });
-    return c.json(errorMessage("User already exists"), 400);
   }
 };
 

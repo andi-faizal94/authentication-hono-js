@@ -16,7 +16,6 @@
     "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "crypto": "^1.0.1",
-    "express-rate-limit": "^7.5.0",
     "hono": "^4.6.16",
     "jsonwebtoken": "^9.0.2",
     "mock-aws-s3": "^4.0.2",

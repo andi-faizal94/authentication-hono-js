@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "src/index.ts",
+      "use": "bun"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "build/index.js"
+    }
+  ]
+}
